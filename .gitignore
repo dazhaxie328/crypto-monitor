@@ -1,0 +1,27 @@
+# 数据文件
+*.json
+!config.json
+data/
+.crypto-monitor/
+
+# 日志文件
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# PID 文件
+*.pid
