@@ -15,6 +15,20 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import os
 
+# ============ 加载 .env 文件 ============
+def load_env_file():
+    """加载 .env 文件中的环境变量"""
+    env_file = Path.home() / "crypto-monitor" / ".env"
+    if env_file.exists():
+        with open(env_file, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
+                    os.environ[key.strip()] = value.strip()
+
+load_env_file()
+
 # ============ 配置 ============
 CONFIG = {
     # CoinGecko API (免费额度: 10-30 次/分钟)
@@ -32,7 +46,7 @@ CONFIG = {
     # 监控间隔（秒）
     "check_interval": 300,  # 5分钟检查一次
     
-    # 推送配置
+    # 推送配置（从环境变量读取）
     "telegram_bot_token": os.getenv("TELEGRAM_BOT_TOKEN", ""),
     "telegram_chat_id": os.getenv("TELEGRAM_CHAT_ID", ""),
     

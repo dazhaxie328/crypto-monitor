@@ -11,6 +11,30 @@ from datetime import datetime
 from pathlib import Path
 import os
 
+# ============ 加载 .env 文件 ============
+def load_env_file():
+    """加载 .env 文件中的环境变量"""
+    env_file = Path.home() / "crypto-monitor" / ".env"
+    if env_file.exists():
+        with open(env_file, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
+                    os.environ[key.strip()] = value.strip()
+
+load_env_file()
+
+# ============ 加载配置 ============
+CONFIG_FILE = Path.home() / "crypto-monitor" / "config.json"
+USER_CONFIG = {}
+if CONFIG_FILE.exists():
+    try:
+        with open(CONFIG_FILE, "r") as f:
+            USER_CONFIG = json.load(f)
+    except:
+        pass
+
 # ============ Solana Meme 币配置 ============
 SOLANA_MEME_CONFIG = {
     # 热门 Solana meme 币列表
@@ -39,9 +63,9 @@ SOLANA_MEME_CONFIG = {
     "coingecko_api": "https://api.coingecko.com/api/v3",
     "solscan_api": "https://public-api.solscan.io",
     
-    # 推送
-    "telegram_bot_token": os.getenv("TELEGRAM_BOT_TOKEN", ""),
-    "telegram_chat_id": os.getenv("TELEGRAM_CHAT_ID", ""),
+    # 推送（从配置文件读取）
+    "telegram_bot_token": USER_CONFIG.get("telegram_bot_token", os.getenv("TELEGRAM_BOT_TOKEN", "")),
+    "telegram_chat_id": USER_CONFIG.get("telegram_chat_id", os.getenv("TELEGRAM_CHAT_ID", "")),
     
     # 存储
     "data_file": Path.home() / "crypto-monitor" / "solana_meme_data.json",
