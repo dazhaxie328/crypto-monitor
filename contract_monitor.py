@@ -213,8 +213,18 @@ class ContractMonitor:
                 print(f"  最近转账: {len(transfers)} 笔")
                 
                 # 检测大额转账
-                large_transfers = self.detect_large_transfers(transfers, threshold=10000)
-                all_alerts.extend(large_transfers)
+                for transfer in transfers:
+                    amount = float(transfer.get("amount", 0))
+                    if amount >= 10000:  # 大额转账阈值
+                        all_alerts.append({
+                            "type": "large_transfer",
+                            "token": token_name,
+                            "contract": contract_address,
+                            "amount": amount,
+                            "from": transfer.get("src", "N/A"),
+                            "to": transfer.get("dst", "N/A"),
+                            "hash": transfer.get("txHash", "N/A")
+                        })
             
             # 获取持有者
             holders = self.get_solana_token_holders(contract_address, limit=10)
@@ -248,6 +258,7 @@ class ContractMonitor:
                         all_alerts.append({
                             "type": "large_transfer",
                             "token": token_name,
+                            "contract": contract_address,
                             "amount": amount,
                             "from": transfer.get("from", "N/A"),
                             "to": transfer.get("to", "N/A"),
@@ -304,11 +315,16 @@ class ContractMonitor:
             if alert["type"] == "large_transfer":
                 message += f"💰 <b>大额转账</b>\n"
                 message += f"   代币: {alert.get('token', 'N/A')}\n"
+                message += f"   合约: <code>{alert.get('contract', 'N/A')}</code>\n"
                 message += f"   金额: {alert.get('amount', 0):,.2f}\n"
                 message += f"   从: {alert.get('from', 'N/A')[:20]}...\n"
-                message += f"   到: {alert.get('to', 'N/A')[:20]}...\n\n"
+                message += f"   到: {alert.get('to', 'N/A')[:20]}...\n"
+                if alert.get('hash'):
+                    message += f"   Tx: {alert.get('hash', 'N/A')[:20]}...\n"
+                message += "\n"
             elif alert["type"] == "holder_change":
                 message += f"📊 <b>持有者变化</b>\n"
+                message += f"   合约: <code>{alert.get('contract', 'N/A')}</code>\n"
                 message += f"   地址: {alert.get('address', 'N/A')[:20]}...\n"
                 message += f"   变化: {alert.get('change', 0):+.2f}%\n\n"
         
