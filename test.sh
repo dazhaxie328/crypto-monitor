@@ -10,7 +10,7 @@ cat > /tmp/test_monitor.py << 'EOF'
 """测试监控功能"""
 
 import sys
-sys.path.insert(0, '/home/enovo/crypto-monitor')
+sys.path.insert(0, '/home/xxx/crypto-monitor')
 
 from monitor import CryptoDataFetcher, AnomalyDetector
 
